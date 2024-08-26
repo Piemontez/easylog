@@ -1,7 +1,7 @@
 import { Controller, Logger, Param, Body, UsePipes, Get, Query, Post } from '@nestjs/common';
 import { RegisterValidationPipe } from '../../../commons/validation.pipe';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
-import { LogSearchDto } from './dto/search.dto';
+import { LogJsonDataSearchDto, LogPlainDataSearchDto } from './dto/search.dto';
 import { SearchService } from 'src/app/processor/search.service';
 
 @Controller('log')
@@ -32,10 +32,10 @@ export class SearchController {
   @ApiParam({ name: 'index', description: 'Indice para agrupamento dos dados' })
   @Get('/:index')
   @UsePipes(new RegisterValidationPipe())
-  async search(@Param('index') index: string, @Query() { where, ...options }: LogSearchDto): Promise<any> {
+  async search(@Param('index') index: string, @Query() { where, ...options }: LogJsonDataSearchDto): Promise<any> {
     this.logger.log('search');
 
-    const itens = await this.searchService.seach(index, where, options);
+    const itens = await this.searchService.seach(index, 'plain', where as any, options);
     return itens;
   }
 
@@ -44,12 +44,23 @@ export class SearchController {
    */
   @ApiOperation({ tags: ['Log'], summary: 'Coleta os logs de dados' })
   @ApiParam({ name: 'index', description: 'Indice para agrupamento dos dados' })
-  @Post('/:index/_search')
+  @Post('/:index/_search/json')
   @UsePipes(new RegisterValidationPipe())
-  async searchFromPost(@Param('index') index: string, @Body() { where, ...options }: LogSearchDto): Promise<any> {
+  async searchJsonFromPost(@Param('index') index: string, @Body() { where, ...options }: LogJsonDataSearchDto): Promise<any> {
     this.logger.log('searchFromPost');
 
-    const itens = await this.searchService.seach(index, where, options);
+    const itens = await this.searchService.seach(index, 'json', where as any, options);
+    return itens;
+  }
+
+  @ApiOperation({ tags: ['Log'], summary: 'Coleta os logs de dados' })
+  @ApiParam({ name: 'index', description: 'Indice para agrupamento dos dados' })
+  @Post('/:index/_search/plain')
+  @UsePipes(new RegisterValidationPipe())
+  async searchPlainFromPost(@Param('index') index: string, @Body() { where, ...options }: LogPlainDataSearchDto): Promise<any> {
+    this.logger.log('searchFromPost');
+
+    const itens = await this.searchService.seach(index, 'plain', where as any, options);
     return itens;
   }
 }

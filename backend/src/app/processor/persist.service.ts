@@ -4,6 +4,7 @@ import logConfig from 'src/config/log.config';
 import { Writer } from './io/writer';
 import { QueueService } from './queue.service';
 import { resolveDirname } from 'src/commons/file.utils';
+import LogRawData from 'src/commons/type/lograwdata';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class PersistService {
@@ -34,7 +35,7 @@ export class PersistService {
   }
 
   private persistData(next: DoneFunction): void {
-    let data;
+    let data:LogRawData;
     do {
       data = this.queueService.dequeuePersistData();
       if (data) {
@@ -43,10 +44,10 @@ export class PersistService {
 
         const writer = this.writers[index];
 
-        if (typeof data === 'object') {
+        if (typeof data.data === 'object') {
           writer.write(JSON.stringify(data));
         } else {
-          writer.write(data);
+          writer.write(data.data);
         }
       }
     } while (data);

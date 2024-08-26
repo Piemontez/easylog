@@ -1,6 +1,6 @@
 //Código inspirado em: https://github.com/mikro-orm/mikro-orm/blob/cc0fc5f8e4190270c197c3f0c1d2f326fd133212/packages/core/src/utils/QueryHelper.ts#L3
 
-import { isPlainObject } from 'lodash';
+import { isPlainObject, isArray } from 'lodash';
 import LogRawData from './type/lograwdata';
 import { FilterQuery, QueryOperator, QueryOperators, Scalar } from './type/whereoperator';
 
@@ -66,6 +66,15 @@ export function testJsonWhere(line: Scalar | Record<string, any>, where: FilterQ
       passed &&= processOperator(line[key], '$eq', value);
     }
     if (!passed) return false;
+  }
+
+  return passed;
+}
+
+export function testPlainWhere(line: string, where: string | string[]): boolean | FilterQuery<LogRawData | any> {
+  let passed = true;
+  for (const value of isArray(where) ? where : [where]) {
+    passed &&= processOperator(value, '$in', line);
   }
 
   return passed;

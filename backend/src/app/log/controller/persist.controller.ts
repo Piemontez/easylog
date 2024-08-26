@@ -1,6 +1,6 @@
-import { Controller, Logger, Param, Post, Body, UsePipes, Query } from '@nestjs/common';
+import { Controller, Logger, Param, Post, UsePipes, Query, Req, Body } from '@nestjs/common';
 import { RegisterValidationPipe } from '../../../commons/validation.pipe';
-import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { QueueService } from 'src/app/processor/queue.service';
 import { PersistService } from 'src/app/processor/persist.service';
 import { LogPersistDto, LogPersistOptionsDto } from './dto/persist.dto';
@@ -25,6 +25,7 @@ export class PersistController {
   @ApiOperation({ tags: ['Log Persist'], summary: 'Registra o log de dados' })
   @ApiParam({ name: 'index', description: 'Indice para agrupamento dos dados' })
   @ApiBody({ schema: { type: 'object', nullable: false } })
+  @ApiConsumes('application/json', 'text/plain')
   @Post('/:index')
   @UsePipes(new RegisterValidationPipe())
   async persist(@Param('index') index: string, @Query() query: LogPersistOptionsDto, @Body() body: LogPersistDto): Promise<any> {
@@ -36,7 +37,7 @@ export class PersistController {
     if (query?.async === 'true') {
       this.queueService //
         .queuePersist(data)
-        .then(() => this.persistService.flush());
+        .then(this.persistService.flush);
     } else {
       await this.queueService.queuePersist(data);
       await this.persistService.flush();
@@ -46,6 +47,8 @@ export class PersistController {
   }
 
   private validate(index: string, body: LogPersistDto) {
+    this.logger.verbose('validate');
+
     const validIndex = this.persistService.formatIndex(index);
     if (validIndex !== index) {
       throw new FormException([{ kind: 'index', error: 'has_invalid_character' }]);
@@ -55,7 +58,7 @@ export class PersistController {
     }
   }
 
-  private formatData(index: string, data: any): LogRawData {
+  private formatData(index: string, data: LogPersistDto): LogRawData {
     return {
       index,
       time: new Date(),

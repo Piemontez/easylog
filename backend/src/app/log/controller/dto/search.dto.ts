@@ -6,7 +6,7 @@ import { FilterQuery } from 'src/commons/type/whereoperator';
 
 // DTO para busca de dados
 @Exclude()
-export class LogSearchDto {
+export class LogJsonDataSearchDto {
   @ApiProperty({ description: 'Filtros' })
   @Expose()
   @IsOptional()
@@ -16,11 +16,31 @@ export class LogSearchDto {
   @Expose()
   @IsNumber()
   @IsOptional()
-  page?: number
+  page?: number;
 
   @ApiProperty({ description: 'Quantidade por página' })
   @Expose()
   @IsNumber()
   @IsOptional()
-  perPage?: number
+  perPage?: number;
+}
+
+@Exclude()
+export class LogPlainDataSearchDto {
+  @ApiProperty({ description: 'Filtros' })
+  @Expose()
+  @IsOptional()
+  where?: string | string[];
+
+  @ApiProperty({ description: 'Página' })
+  @Expose()
+  @IsNumber()
+  @IsOptional()
+  page?: number;
+
+  @ApiProperty({ description: 'Quantidade por página' })
+  @Expose()
+  @IsNumber()
+  @IsOptional()
+  perPage?: number;
 }

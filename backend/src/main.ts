@@ -2,9 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
 import easylogConfig from './config/easylog.config';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+  });
+
+  app.useBodyParser('text');
 
   // Swagger
   const config = new DocumentBuilder().setTitle('Thalamus Easy Log Swagger').setDescription('All endpoints are available on swagger ').build();

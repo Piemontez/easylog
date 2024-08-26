@@ -13,4 +13,4 @@ export class LogPersistOptionsDto {
 }
 
 // DTO Opções de percistência disponíveis
-export type LogPersistDto = Record<string, any>;
+export type LogPersistDto = Record<string, any> | string;
