@@ -13,7 +13,7 @@ const Footer: React.FC<{ center?: boolean }> = ({ center }) => {
         <Col md={{ span: 2, offset: center ? 3 : 6 }}></Col>
         <Col md={{ span: 2 }}>
           <a href={docUrl} target="_blank" rel="noopener noreferrer" className="text-body" style={{ color: 'red', textDecoration: 'none' }}>
-            Easylog {version}
+            EasyLog {version}
           </a>
         </Col>
         <Col md={{ span: 2 }}>

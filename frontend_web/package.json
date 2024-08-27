@@ -1,10 +1,9 @@
 {
-  "name": "thalamus_easylog",
+  "name": "easylog",
   "version": "0.1.0",
-  "author": "Thalamus",
+  "author": "Rafael Alexandre Piemontez",
   "since": "2022",
-  "url": "https://thalamus.digital/",
-  "docUrl": "https://docs.register.thalamus.digital/",
+  "url": "https://localhost/",
   "private": false,
   "engines": {
     "node": ">=18.0"

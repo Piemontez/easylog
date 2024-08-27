@@ -13,8 +13,7 @@ $form-group-margin-bottom: .5rem;
 $form-label-margin-bottom: .2rem !default;
 $label-margin-bottom: .05rem;
 
-@import "thalamus";
-@import "ticons";
+@import "base";
 
 @import "~bootstrap/scss/bootstrap";
 @import "scss/loader";

@@ -1,5 +1,4 @@
 export default {
-  //BASE_URL: 'http://localhost:3002',
-  BASE_URL: '',
-  BASE_PORT: '8080'
+  BASE_URL: 'http://localhost',
+  BASE_PORT: '3002'
 };

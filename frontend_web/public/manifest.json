@@ -1,6 +1,6 @@
 {
-  "short_name": "T Register",
-  "name": "Thalamus Register",
+  "short_name": "log",
+  "name": "easylog",
   "icons": [
     {
       "src": "logo526.png",

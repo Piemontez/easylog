@@ -19,17 +19,19 @@ const AllLogsPage = () => {
   );
 };
 
-const AllLogs = () => {
+const AllLogs = observer(() => {
+  const ctrl = useAllLogsCtrlStore();
   return (
     <>
       <h1>Todos os logs</h1>
       <p>Listagem com todos os registros de logs</p>
 
       <SearchBar />
-      <LogsTable />
+      {ctrl.filterLogFormat === 'plain' && <LogsPlainTable />}
+      {ctrl.filterLogFormat === 'json' && <LogsJsonTable />}
     </>
   );
-};
+});
 
 const SearchBar = observer(() => {
   const ctrl = useAllLogsCtrlStore();
@@ -38,6 +40,15 @@ const SearchBar = observer(() => {
       <Row>
         <Col>
           <Form.Group className="mb-3">
+            <Form.Group className="mb-3">
+              <Form.Label htmlFor="indexes">Formato do log:</Form.Label>
+              <Form.Select id="indexes" onChange={ctrl.handleLogFormat}>
+                <option></option>
+                <option value={'plain'}>Plain text</option>
+                <option value={'json'}>Json</option>
+              </Form.Select>
+            </Form.Group>
+
             <Form.Label htmlFor="filters">Filtros:</Form.Label>
             <Form.Control
               id="filters"
@@ -90,7 +101,7 @@ const SearchBar = observer(() => {
   );
 });
 
-const LogsTable = observer(() => {
+const LogsJsonTable = observer(() => {
   const ctrl = useAllLogsCtrlStore();
   return (
     <>
@@ -115,21 +126,58 @@ const LogsTable = observer(() => {
           </tr>
         </thead>
         <tbody>
-          {ctrl?.response === null && (
+          {ctrl?.responseData === null && (
             <tr>
               <td colSpan={3}>Selecione um índice e realize uma busca</td>
             </tr>
           )}
-          {ctrl?.response?.length === 0 && (
+          {ctrl?.responseData?.length === 0 && (
             <tr>
               <td colSpan={3}>Nenhum resultado encontrado</td>
             </tr>
           )}
-          {ctrl?.response?.map((log, idx) => (
+          {ctrl?.responseData?.map((log, idx) => (
             <tr key={idx}>
               <td>{log.index}</td>
               <td>{log.time}</td>
               <td>{JSON.stringify(log.data)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+      <Pagination className="mr-2" size="sm" style={{ marginBottom: 0 }}>
+        <Pagination.Prev onClick={ctrl!.handlePreviewsPage} disabled={ctrl.page === 1} id="previews_page" />
+        <Pagination.Item>{ctrl!.page}</Pagination.Item>
+        <Pagination.Next onClick={ctrl!.handleNextPage} id="next_page" />
+      </Pagination>
+    </>
+  );
+});
+
+const LogsPlainTable = observer(() => {
+  const ctrl = useAllLogsCtrlStore();
+  return (
+    <>
+      <Table responsive striped>
+        <thead>
+          <tr>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ctrl?.responseData === null && (
+            <tr>
+              <td colSpan={3}>Selecione um índice e realize uma busca</td>
+            </tr>
+          )}
+          {ctrl?.responseData?.length === 0 && (
+            <tr>
+              <td colSpan={3}>Nenhum resultado encontrado</td>
+            </tr>
+          )}
+          {ctrl?.responseData?.map((log, idx) => (
+            <tr key={idx}>
+              <td>{log}</td>
             </tr>
           ))}
         </tbody>

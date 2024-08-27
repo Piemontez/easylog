@@ -18,8 +18,8 @@ const router = createBaseRouter(createRoutesFromElements(routes));
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.Suspense fallback="loading">
-    <Helmet title="Thalamus Register">
-      <meta name="description" content="Thalamus Register" />
+    <Helmet title="EasyLog">
+      <meta name="description" content="EasyLog" />
     </Helmet>
     <UserProvider value={UserCtxInstance}>
       <RouterProvider router={router} />

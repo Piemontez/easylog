@@ -6,6 +6,16 @@ import type { ErrorListRecord } from '../../../commons/types/ErrorListRecord';
 import { SearchDataSource } from '../../../datasources/search';
 import type { Indexes } from '../../../datasources/search';
 import { DateTime } from 'luxon';
+import { AxiosResponse } from 'axios';
+
+const defaultJsonFilters = `{ "where": {
+  "data": {
+
+  }
+}}`;
+const defaultPlainFilters = `{ 
+  "where": []
+}`;
 
 export class AllLogsCtrl {
   constructor() {
@@ -16,6 +26,7 @@ export class AllLogsCtrl {
   // AllLogsCtrl
   @observable page = 1;
   @observable perPage = 250;
+  @observable filterLogFormat: 'plain' | 'json' | '' = '';
   @observable filterIndex = '';
   @observable filterBegin = '';
   @observable filterEnd = '';
@@ -23,7 +34,7 @@ export class AllLogsCtrl {
 
   @observable waiting: boolean | null = null;
   @observable indexes: Indexes = [];
-  @observable response: any[] | null = null;
+  @observable responseData: any[] | null = null;
   // Erros
   @observable erroMessages: string[] = [];
   @observable erros: ErrorListRecord = {};
@@ -33,12 +44,21 @@ export class AllLogsCtrl {
     this.filterIndex = '';
     this.filterBegin = DateTime.now().minus({ weeks: 1 }).toFormat('dd/MM/yyyy');
     this.filterEnd = '';
-    this.filters = `{ "where": {
-      "data": {
+    this.filters = defaultJsonFilters;
+    this.responseData = null;
+  };
 
-      }
-}}`;
-    this.response = null;
+  @action
+  handleLogFormat = (e: any) => {
+    this.filterLogFormat = e.target.value;
+    switch (this.filterLogFormat) {
+      case 'plain':
+        this.filters = defaultPlainFilters;
+        break;
+      case 'json':
+        this.filters = defaultJsonFilters;
+        break;
+    }
   };
 
   @action
@@ -101,9 +121,11 @@ export class AllLogsCtrl {
   findIndexes = () => {
     new SearchDataSource()
       .findIndexes()
-      .then((response) => {
-        this.indexes = response?.data;
-      })
+      .then(
+        action((response) => {
+          this.indexes = response?.data;
+        }),
+      )
       .catch((ex) => {
         this.notifyExeption(ex);
       });
@@ -118,7 +140,14 @@ export class AllLogsCtrl {
   @action
   search = () => {
     if (this.waiting) return;
-    if (!this.filterIndex) return;
+    if (!this.filterLogFormat) {
+      notify.info('Selecione o formato do log');
+      return;
+    }
+    if (!this.filterIndex) {
+      notify.info('Selecione o indice de busca');
+      return;
+    }
 
     this.waiting = true;
     this.erroMessages = [];
@@ -145,21 +174,35 @@ export class AllLogsCtrl {
       return;
     }
 
-    new SearchDataSource()
-      .search(this.filterIndex, filters)
-      .then((response) => {
-        this.waiting = false;
-        this.response = response?.data || [];
-      })
-      .catch((ex) => {
-        this.waiting = false;
-        this.response = [];
+    let request: Promise<AxiosResponse<any>>;
+    switch (this.filterLogFormat) {
+      case 'plain':
+        request = new SearchDataSource().searchPlain(this.filterIndex, filters);
+        break;
+      case 'json':
+        request = new SearchDataSource().searchJson(this.filterIndex, filters);
+        break;
+    }
 
-        const data = ex.response?.data;
-        [this.erroMessages, this.erros] = getFormExceptionErrosToObject(data, { splitByConstraints: true }) as ErrosAsList;
+    if (request)
+      request
+        .then(
+          action((response) => {
+            this.waiting = false;
+            this.responseData = response?.data || [];
+          }),
+        )
+        .catch(
+          action((ex) => {
+            this.waiting = false;
+            this.responseData = [];
 
-        this.notifyExeption(ex);
-      });
+            const data = ex.response?.data;
+            [this.erroMessages, this.erros] = getFormExceptionErrosToObject(data, { splitByConstraints: true }) as ErrosAsList;
+
+            this.notifyExeption(ex);
+          }),
+        );
   };
 
   notifyExeption = (ex: any) => {

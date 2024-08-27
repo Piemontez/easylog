@@ -1,4 +1,4 @@
-# Thalamus - Register
+# EasyLog
 
 ## Tecnologias utilizadas no projeto
 
@@ -80,6 +80,6 @@ $ yarn test:e2e
 
 ## Support
 
-- Author - [Thalamus](http://thalamus.digital/)
+- Author - Rafael Alexandre Piemontez
 
 ## License

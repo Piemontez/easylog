@@ -12,7 +12,7 @@ const Header: React.FC = () => {
         <Navbar.Brand href="/">
           <>
             <img src="/logo.png" alt="logo" />
-            Easylog
+            EasyLog
           </>
         </Navbar.Brand>
 

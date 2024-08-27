@@ -12,7 +12,7 @@ async function bootstrap() {
   app.useBodyParser('text');
 
   // Swagger
-  const config = new DocumentBuilder().setTitle('Thalamus Easy Log Swagger').setDescription('All endpoints are available on swagger ').build();
+  const config = new DocumentBuilder().setTitle('EasyLog Swagger').setDescription('All endpoints are available on swagger ').build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
